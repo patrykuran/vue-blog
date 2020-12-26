@@ -1,43 +1,32 @@
 <template>
   <div class="home">
-    <h1>Home</h1>
     <div v-if="error">{{ error }}</div>
     <div v-if="posts.length">
-      <PostList :posts="posts"/>
+      <PostList :posts="posts" />
     </div>
-    <div v-else>Loading...</div>
+    <div v-else>
+      <Spinner />
+    </div>
   </div>
 </template>
 
 <script>
-  import {ref} from 'vue'
+import { ref } from 'vue'
+import getPosts from '../composables/getPosts'
 
-  // component imports
-  import PostList from '../components/PostList.vue'
+// component imports
+import PostList from '../components/PostList.vue'
+import Spinner from '../components/Spinner.vue'
 
-  export default {
-    name: 'Home',
-    components: {PostList},
-    setup() {
-      const posts = ref([]);
-      const error = ref(null);
+export default {
+  name: 'Home',
+  components: { PostList, Spinner },
+  setup() { 
+    const { posts, error, load } = getPosts()
 
-      const load = async () => {
-        try {
-          const data = await fetch('http://localhost:3000/posts')
-          if (!data.ok) {
-            throw Error('data is not available')
-          }
-          posts.value = await data.json();
-        } catch
-          (err) {
-          error.value = err.message
-        }
-      }
-
-      load();
-
-      return {posts, error}
-    }
-  }
+    load()
+    
+    return { posts, error }
+  },
+}
 </script>
